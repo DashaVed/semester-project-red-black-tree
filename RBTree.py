@@ -75,10 +75,66 @@ class RBTree:
         return self.get(key, current_node.right_child)
 
     def remove(self, node):
+        if node is None:
+            raise KeyError
         if node.red:
+            # удаление красного узла с двумя детьми
             if node.has_left_child():
-                pass
+                min_right = self.min_in_right(node)
+                max_left = self.max_in_left(node)
+                if min_right.red:
+                    self.swap(node, min_right)
+                    return self.remove(min_right)
+                self.swap(node, max_left)
+                return self.remove(max_left)
+            # удаление красного узла без детей
+            if node.isLeftChild():
+                node.parent.left = None
+            node.parent.right = None
+            return
+        # удаление черного узла с правым ребенком
+        if node.left is None and node.right is not None:
+            node.key, node.value = node.right.key, node.right.value
+            node.right = None
+            return
+        # удаление черного узла с левым ребенком
+        elif node.left is not None and node.right is None:
+            node.key, node.value = node.left.key, node.left.value
+            node.left = None
+            return
+        # удаление черного узла без детей
+        elif node.left is None and node.right is None:
+            if node.isLeftChild():
+                node.parent.left = None
+            node.parent.right = None
+            self.correct_tree(node.parent)
+            return
+        # удаление черного узла с двумя детьми
+        min_right = self.min_in_right(node)
+        max_left = self.max_in_left(node)
+        if min_right.left is not None or min_right.right is not None:
+            self.swap(node, min_right)
+            return self.remove(min_right)
+        self.swap(node, max_left)
+        return self.remove(max_left)
 
+    @staticmethod
+    def swap(node1, node2):
+        temporary_node = node1
+        node1.key, node1.value = node2.key, node2.value
+        node2.key, node2.value = temporary_node.key, temporary_node.value
+
+    @staticmethod
+    def min_in_right(node):
+        while node.left is not None:
+            node = node.left
+        return node
+
+    @staticmethod
+    def max_in_left(node):
+        while node.right is not None:
+            node = node.right
+        return node
 
     def check_color(self, node):
         if node == self.root:
@@ -179,3 +235,6 @@ class RBTree:
     def lr_rotate(self, node):
         self.left_rotate(node.left)
         self.right_rotate(node)
+
+
+
