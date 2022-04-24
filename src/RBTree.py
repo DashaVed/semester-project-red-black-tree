@@ -1,4 +1,7 @@
 class Node:
+    """
+    A class for nodes
+    """
 
     def __init__(self, key, value, red=True, left=None, right=None, parent=None):
         self.key = key
@@ -16,12 +19,16 @@ class Node:
         """return right child"""
         return self.right
 
-    def isLeftChild(self):
+    def is_left_child(self):
         """check what kind of child node is"""
         return self.parent.left == self
 
 
 class RBTree:
+
+    """
+    A basic class for red-black tree
+    """
 
     def __init__(self):
         self.root = None
@@ -37,20 +44,19 @@ class RBTree:
         self.size += 1
 
     def insert(self, key, value, current_node):
+        """Method fot inserting node"""
         if key < current_node.key:
             if current_node.has_left_child():
                 return self.insert(key, value, current_node.left)
-            else:
-                current_node.left = Node(key, value, parent=current_node)
-                return current_node.left
-        else:
-            if current_node.has_right_child():
-                return self.insert(key, value, current_node.right)
-            else:
-                current_node.right = Node(key, value, parent=current_node)
-                return current_node.right
+            current_node.left = Node(key, value, parent=current_node)
+            return current_node.left
+        if current_node.has_right_child():
+            return self.insert(key, value, current_node.right)
+        current_node.right = Node(key, value, parent=current_node)
+        return current_node.right
 
     def check_color(self, node):
+        """check violation"""
         if node == self.root or node is None:
             return
         if node.red is True and node.parent.red is True:
@@ -62,7 +68,7 @@ class RBTree:
         if aunt is black: rotate
         if aunt is red: colorFlip
         """
-        if node.parent.isLeftChild():
+        if node.parent.is_left_child():
             # aunt is node.grandparent.right
             if node.parent.parent.right is None or node.parent.parent.right.red is False:
                 return self.rotate(node)
@@ -82,8 +88,8 @@ class RBTree:
         return
 
     def rotate(self, node):
-        if node.isLeftChild():
-            if node.parent.isLeftChild():
+        if node.is_left_child():
+            if node.parent.is_left_child():
                 self.right_rotate(node.parent.parent)
                 node.red = True
                 node.parent.red = False
@@ -95,7 +101,7 @@ class RBTree:
             node.right.red = True
             node.left.red = True
             return
-        if node.parent.isLeftChild():
+        if node.parent.is_left_child():
             self.lr_rotate(node.parent.parent)
             node.red = False
             node.right.red = True
@@ -140,6 +146,7 @@ class RBTree:
         return None
 
     def remove(self, node):
+        """Method for removing node"""
         if node is None:
             return
         if node.red:
@@ -186,6 +193,7 @@ class RBTree:
             return self.remove(max_left)
 
     def fix_delete(self, node):
+        """correct tree after deleting"""
         if node is None:
             return
         if node.red:
@@ -258,18 +266,21 @@ class RBTree:
 
     @staticmethod
     def swap(node1, node2):
+        """change key, value between two nodes"""
         temporary_node = node1
         node1.key, node1.value = node2.key, node2.value
         node2.key, node2.value = temporary_node.key, temporary_node.value
 
     @staticmethod
     def min_in_right(node):
+        """finding the minimum node in the right subtree"""
         while node.left is not None:
             node = node.left
         return node
 
     @staticmethod
     def max_in_left(node):
+        """finding the maximum node in the left subtree"""
         while node.right is not None:
             node = node.right
         return node
@@ -284,7 +295,7 @@ class RBTree:
             temporary_node.parent = None
         else:
             temporary_node.parent = node.parent
-            if node.isLeftChild():
+            if node.is_left_child():
                 temporary_node.parent.left = temporary_node
             else:
                 temporary_node.parent.right = temporary_node
@@ -301,7 +312,7 @@ class RBTree:
             temporary_node.parent = None
         else:
             temporary_node.parent = node.parent
-            if node.isLeftChild():
+            if node.is_left_child():
                 node.parent.left = temporary_node
             else:
                 node.parent.right = temporary_node
@@ -317,6 +328,7 @@ class RBTree:
         self.right_rotate(node)
 
     def black_height(self, node):
+        """number of black nodes"""
         if node is None:
             return 1
         right_black = self.black_height(node.right)
@@ -327,13 +339,13 @@ class RBTree:
             left_black += 1
         return True
 
-    # Function to call print
     def print_tree(self):
+        """Function to call print method"""
         print(self.root.key)
         self.__print_call(self.root, "", True)
 
-    # Function to print
     def __print_call(self, node, indent, last):
+        """Function to print a tree"""
         if node is not None:
             print(indent, end=' ')
             if last:
@@ -358,9 +370,6 @@ if __name__ == "__main__":
     rb_tree[8] = 0
     rb_tree[10] = 0
     rb_tree[6] = 0
-
-
-
     rb_tree.print_tree()
 
     print("\nAfter deleting an element")
